@@ -9,6 +9,11 @@ name: OpenWrt-CI
 
 on:
   workflow_dispatch:
+    inputs:
+      ssh:
+        description: 'SSH connection to Actions'
+        required: false
+        default: 'false'
     
 permissions:
   contents: read
@@ -47,28 +52,11 @@ jobs:
           ./scripts/feeds update -a
           ./scripts/feeds install -a
 
+      - name: SSH connection to Actions
+        uses: P3TERX/ssh2actions@v1.0.0
+
       - name: Generate configuration file
-        run: |
-          # rm -f ./.config*
-          # touch ./.config
-          #
-          # 在 cat >> .config <<EOF 到 EOF 之间粘贴你的编译配置, 需注意缩进关系
-          # 例如:
-          # cat >> .config <<EOF
-          # CONFIG_TARGET_ipq40xx=y          
-          # CONFIG_TARGET_ipq40xx_generic=y
-          # CONFIG_TARGET_MULTI_PROFILE=y
-          # CONFIG_TARGET_BOARD="ipq40xx"
-          # CONFIG_TARGET_DEVICE_ipq40xx_generic_DEVICE_avm_fritzbox-4040=y
-          # CONFIG_TARGET_DEVICE_PACKAGES_ipq40xx_generic_DEVICE_avm_fritzbox-4040=""
-          # CONFIG_TARGET_DEVICE_ipq40xx_generic_DEVICE_netgear_rbr50=y
-          # CONFIG_TARGET_DEVICE_PACKAGES_ipq40xx_generic_DEVICE_netgear_rbr50=""
-          # EOF
-          #
-          # ===============================================================
-          # 
-          # sed -i 's/^[ \t]*//g' ./.config
-          make defconfig
+        run: make defconfig
 
       - name: Download packages
         run: make download -j16
